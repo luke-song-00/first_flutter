@@ -1,4 +1,5 @@
 import "package:english_words/english_words.dart";
+import "package:flutter/cupertino.dart";
 import "package:flutter/material.dart";
 
 class RandomWords extends StatefulWidget {
@@ -22,8 +23,9 @@ class _RandomWordsState extends State<RandomWords> {
         style: _biggerFont,
       ),
       trailing: Icon(
-        alreadySaved ? Icons.favorite : Icons.favorite_border,
-        color: alreadySaved ? Colors.red : null,
+        alreadySaved ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
+        // alreadySaved ? Icons.favorite : Icons.favorite_border,
+        color: alreadySaved ? Colors.amber : null,
         semanticLabel: alreadySaved ? "Remove from saved" : "Save",
       ),
       onTap: () {
@@ -34,11 +36,51 @@ class _RandomWordsState extends State<RandomWords> {
     );
   }
 
+  void _pushSaved() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) {
+          final tiles = _saved.map(
+            (pair) {
+              return ListTile(
+                title: Text(
+                  pair.asPascalCase,
+                  style: _biggerFont,
+                ),
+              );
+            },
+          );
+          final divided = tiles.isNotEmpty
+              ? ListTile.divideTiles(
+                  context: context,
+                  tiles: tiles,
+                ).toList()
+              : <Widget>[];
+
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text("Saved Suggestions"),
+            ),
+            body: ListView(children: divided),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("StartUp Name Generator"),
+        actions: [
+          // IconButton(icon: const Icon(CupertinoIcons.alarm), onPressed: () {}),
+          IconButton(
+            icon: const Icon(Icons.list),
+            onPressed: _pushSaved,
+            tooltip: "Saved Suggestions",
+          ),
+        ],
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16.0),
